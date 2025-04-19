@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>健康评估问卷</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .form-container {
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .form-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-header h2 {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .form-header p {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(76, 201, 240, 0.2);
+            outline: none;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .radio-option input {
+            margin-right: 8px;
+            accent-color: var(--primary);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        @media (max-width: 576px) {
+            .form-card {
+                padding: 30px 20px;
+            }
+            
+            .form-header h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-card">
+            <div class="form-header">
+                <h2><i class="fas fa-heartbeat" style="color: var(--primary); margin-right: 10px;"></i>健康评估</h2>
+                <p>请填写您的健康信息，获取个性化建议</p>
+            </div>
+            
+            <form method="POST" action="/result">
+                <div class="form-group">
+                    <label for="height" class="form-label">身高 (cm)</label>
+                    <input type="number" name="height" id="height" class="form-control" placeholder="例如：175" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight" class="form-label">体重 (kg)</label>
+                    <input type="number" name="weight" id="weight" class="form-control" placeholder="例如：68" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="age" class="form-label">年龄</label>
+                    <input type="number" name="age" id="age" class="form-control" placeholder="例如：28" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">性别</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="sex" value="male" required> 男性
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="sex" value="female"> 女性
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="injury" class="form-label">伤病史 (选填)</label>
+                    <input type="text" name="injury" id="injury" class="form-control" placeholder="例如：膝关节损伤、腰椎问题等">
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-chart-line" style="margin-right: 8px;"></i>获取健康评估
+                </button>
+            </form>
+            
+            <div class="form-footer">
+                <p>您的所有信息将被严格保密</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

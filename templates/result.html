@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>健康评估报告</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --danger: #f94144;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: var(--dark);
+        }
+        
+        .report-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            color: #6c757d;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-item {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #6c757d;
+        }
+        
+        .highlight {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .advice-box {
+            background: var(--light);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 5px solid var(--primary);
+        }
+        
+        .advice-title {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+        
+        .advice-content {
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+        
+        .btn-back {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+            border: none;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        .btn-back:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="report-container">
+        <div class="header">
+            <h1>健康评估报告</h1>
+            <p>基于您的身体数据生成的个性化健康建议</p>
+        </div>
+        
+        <div class="card">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value">{{ bmi }}</div>
+                    <div class="stat-label">BMI指数</div>
+                    <div class="stat-status">{{ weight_status }}</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ ideal_weight }} kg</div>
+                    <div class="stat-label">理想体重</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">
+                        {% if weight_diff > 0 %}+{% endif %}{{ weight_diff }} kg
+                    </div>
+                    <div class="stat-label">与理想体重差</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-chart-line"></i>BMI分析图表</h2>
+            <div class="chart-container">
+                <canvas id="bmiChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-dumbbell"></i>运动训练建议</h2>
+            <div class="advice-box">
+                <div class="advice-content">
+                    {% if train_advice %}
+                        {{ train_advice }}
+                    {% else %}
+                        <span>暂无训练建议</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-utensils"></i>饮食营养建议</h2>
+            <div class="advice-box">
+                <div class="advice-content">
+                    {% if diet_advice %}
+                        {{ diet_advice }}
+                    {% else %}
+                        <span>暂无饮食建议</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title"><i class="fas fa-heartbeat"></i>健康注意事项</h2>
+            <div class="advice-box">
+                <div class="advice-content">
+                    {% if injury_advice %}
+                        {{ injury_advice }}
+                    {% else %}
+                        <span>暂无伤病建议</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="/" class="btn-back">重新评估</a>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 健康360评估系统 | 本报告仅供参考，不作为医疗诊断依据</p>
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('bmiChart').getContext('2d');
+        const userBMI = {{ bmi }};
+        
+        // 根据BMI值确定颜色
+        let userColor;
+        if (userBMI < 18.5) {
+            userColor = '#4cc9f0'; // 偏瘦 - 蓝色
+        } else if (userBMI <= 23.9) {
+            userColor = '#66cc99'; // 正常 - 绿色
+        } else if (userBMI <= 27.9) {
+            userColor = '#f8961e'; // 偏重 - 橙色
+        } else {
+            userColor = '#f94144'; // 肥胖 - 红色
+        }
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['偏瘦 (<18.5)', '正常 (18.5-23.9)', '偏重 (24-27.9)', '肥胖 (>28)', '您的BMI'],
+                datasets: [{
+                    label: 'BMI 值',
+                    data: [18, 22, 26, 30, userBMI],
+                    backgroundColor: ['#4cc9f0', '#66cc99', '#f8961e', '#f94144', userColor],
+                    borderWidth: 0,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 40,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
