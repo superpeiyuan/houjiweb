@@ -86,7 +86,5 @@ def result():
                            diet_advice=diet_advice,
                            injury_advice=injury_advice)
 
-#if __name__ == '__main__':
-   # app.run(host='0.0.0.0', port=5000, debug=True)
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)  # 允许局域网访问
+   app.run(host='0.0.0.0', port=5000, debug=True)
